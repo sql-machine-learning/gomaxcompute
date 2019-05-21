@@ -13,7 +13,7 @@ This repo contains a Go driver for MaxCompute(ODPS) by AliCloud. If your Go proj
 Please make sure you have Go 1.6 or high release. 
 
 ```go
-go get -u github.com/sql-machine-learning/gomaxcompute
+go get -u sqlflow.org/gomaxcompute
 ```
 
 Because Go program normally requires a connection string to talk to the select database, we build the string from `access_id`,`access_key`,`endpoint`,`project` in the form of `http://<access_id>:<access_key>@<endpoint>/api?curr_project=<project>`.
@@ -25,7 +25,7 @@ package main
 
 import (
 	"database/sql"
-	"github.com/sql-machine-learning/maxcompute"
+	"sqlflow.org/gomaxcompute"
 )
 
 func assertNoError(e error) {
