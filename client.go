@@ -143,7 +143,7 @@ func parseResponseBody(res *http.Response) ([]byte, error) {
 		return nil, errors.New("nil response")
 	}
 	if res.StatusCode >= 400 {
-		return nil, fmt.Errorf("bad stataus:%d", res.StatusCode)
+		return nil, fmt.Errorf("parseResponseBody error: %d", res.StatusCode)
 	}
 	if res.Body == nil {
 		return nil, errNilBody
