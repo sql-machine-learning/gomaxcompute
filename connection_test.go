@@ -12,7 +12,7 @@ func TestQuery(t *testing.T) {
 	db, err := sql.Open("maxcompute", cfg4test.FormatDSN())
 	a.NoError(err)
 
-	const sql = `select * from yiyang_test_table1;`
-	_, err = db.Query(sql)
+	const stmt = `SELECT * FROM gomaxcompute_test LIMIT 1;`
+	_, err = db.Query(stmt)
 	a.NoError(err)
 }

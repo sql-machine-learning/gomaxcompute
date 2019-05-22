@@ -2,7 +2,6 @@ package gomaxcompute
 
 import (
 	"encoding/xml"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,9 +21,4 @@ func TestJob_GenCreateInstanceXml(t *testing.T) {
 
 	_, err := xml.MarshalIndent(job, "", "    ")
 	a.NoError(err)
-}
-
-func TestNewSQLJob(t *testing.T) {
-	job := newSQLJob(`SELECT 1;`)
-	fmt.Println(string(string(job.XML())))
 }

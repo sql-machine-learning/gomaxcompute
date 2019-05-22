@@ -15,7 +15,7 @@ func TestNext(t *testing.T) {
 	db, err := sql.Open("maxcompute", cfg4test.FormatDSN())
 	a.NoError(err)
 
-	const sql = `select * from yiyang_test_table1;`
+	const sql = `SELECT * from gomaxcompute_test;`
 	rows, err := db.Query(sql)
 	defer rows.Close()
 	a.NoError(err)
