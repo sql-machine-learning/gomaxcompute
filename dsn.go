@@ -1,7 +1,7 @@
 package gomaxcompute
 
 import (
-	"errors"
+	"fmt"
 	"net/url"
 )
 
@@ -38,7 +38,7 @@ func ParseDSN(dsn string) (*Config, error) {
 	password, _ := u.User.Password()
 	proj := u.Query().Get(currentProject)
 	if username == "" || password == "" || proj == "" {
-		return nil, errors.New("invalid odps url")
+		return nil, fmt.Errorf("invalid odps url %v", u)
 	}
 	endpoint := (&url.URL{
 		Scheme: u.Scheme,
