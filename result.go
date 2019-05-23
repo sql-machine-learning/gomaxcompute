@@ -1,5 +1,6 @@
 package gomaxcompute
 
+// odpsResult implements https://golang.org/pkg/database/sql/driver/#Result
 type odpsResult struct {
 	affectedRows int64
 	insertId     int64
