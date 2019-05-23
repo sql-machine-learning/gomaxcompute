@@ -1,5 +1,7 @@
 # MaxCompute Go Driver
 
+[![Build Status](https://travis-ci.org/sql-machine-learning/gomaxcompute.svg?branch=develop)](https://travis-ci.org/sql-machine-learning/gomaxcompute)
+
 [MaxCompute](https://www.alibabacloud.com/product/maxcompute), also known as ODPS, is a distributed storage service and SQL engine provided by [Alibaba Cloud](www.alibabacloud.com/). This repository contains a Go [SQLdriver](https://github.com/golang/go/wiki/SQLDrivers) of MaxCompute.  If you are going to write a Go program that calls the standard library `database/sql` to access MaxCompute databases, you could use this driver.
 
 This project is in its early stage. Your issues and pull requests are very welcome!
