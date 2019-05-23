@@ -43,7 +43,7 @@ func TestConfig_FormatDSN(t *testing.T) {
 	a.Equal("access_id:access_key@service.com/api?curr_project=test_ci&scheme=http", config.FormatDSN())
 }
 
-func TestConfig_ParseAndFormat(t *testing.T) {
+func TestConfig_ParseAndFormatRoundTrip(t *testing.T) {
 	a := assert.New(t)
 	dsn := "access_id:access_key@service.com/api?curr_project=test_ci&scheme=http"
 
