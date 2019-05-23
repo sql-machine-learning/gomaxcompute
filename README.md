@@ -89,4 +89,4 @@ Please be aware that to connect to a MaxCompute database, the user needs to prov
 
 ## Contributions
 
-Thanks to Ruohang Feng, who wrote a Go SDK for MaxCompute when he worked in Alibaba, for his warm help that enabled this project.  This project is a simplified version of Ruohang's code as we removed the SDK part and kept the `database/sql`-driver part.
+Our respect and thanks to Ruohang Feng, who wrote a Go SDK for MaxCompute when he worked in Alibaba, for his warm help that enabled this project.
