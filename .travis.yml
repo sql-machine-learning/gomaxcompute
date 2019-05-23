@@ -1,8 +1,1 @@
 language: go
-
-branches:
-  only:
-  - /.*/
-
-script:
-  - sh scripts/test.sh
