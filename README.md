@@ -87,6 +87,6 @@ Please be aware that to connect to a MaxCompute database, the user needs to prov
 1. the endpoint pointing to the MaxCompute service
 1. a project, which is something similar to a database in MySQL.
 
-## Contributions
+## Acknowledgement
 
 Our respect and thanks to Ruohang Feng, who wrote a Go SDK for MaxCompute when he worked in Alibaba, for his warm help that enabled this project.
