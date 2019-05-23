@@ -57,7 +57,7 @@ func assertNoError(e error) {
 }
 
 func main() {
-    config := goodps.Config{
+    config := gomaxcompute.Config{
         AccessID:  "<access_id>",
         AccessKey: "<access_key>",
         Endpoint:  "<end_point>",
