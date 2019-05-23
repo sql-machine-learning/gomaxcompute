@@ -32,6 +32,9 @@ func ParseDSN(dsn string) (*Config, error) {
 		if len(pair) != 3 {
 			return nil, fmt.Errorf("dsn %s doesn't match access_id:access_key@url?curr_project=project&scheme=http|https", dsn)
 		}
+		if pair[1] != "scheme" && pair[1] != currentProject {
+			return nil, fmt.Errorf("dsn %s 's query is neither scheme or %s", dsn, currentProject)
+		}
 		query[pair[1]] = pair[2]
 	}
 	if _, ok := query[currentProject]; !ok {

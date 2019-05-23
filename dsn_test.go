@@ -26,6 +26,7 @@ func TestConfig_ParseDSN(t *testing.T) {
 		"access_id:access_key@service.com/api?scheme=http",                          // missing curr_project
 		"access_id:access_key@service.com/api?curr_project=test_ci",                 // missing scheme
 		"access_id:access_key@service.com/api?curr_project=test_ci&scheme=whatever", // invalid scheme
+		"access_id:access_key@service.com/api?curr_project=test_ci&scheeeeeee=http", // invalid name
 	}
 	for _, dsn := range badDSN {
 		_, err = ParseDSN(dsn)
