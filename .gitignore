@@ -1,3 +1,16 @@
 nohup.out
 *~
 *.vim
+*~
+*.test
+/Gopkg.lock
+/Gopkg.toml
+/vendor/
+*.swp
+.idea/
+*.vim
+*.log
+/logs
+sql/my_dnn_model
+.DS_Store
+coverage.out
