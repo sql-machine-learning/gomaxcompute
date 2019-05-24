@@ -1,3 +1,6 @@
+nohup.out
+*~
+*.vim
 *~
 *.test
 /Gopkg.lock

@@ -46,7 +46,11 @@ func (conn *odpsConn) Exec(query string, args []driver.Value) (driver.Result, er
 		return nil, err
 	}
 	_, err = conn.getInstanceResult(ins)
-	return nil, err
+	if err != nil {
+		return nil, err
+	}
+	// FIXME(weiguo): precise result
+	return &odpsResult{-1, -1}, nil
 }
 
 // Implements database/sql/driver.Queryer
