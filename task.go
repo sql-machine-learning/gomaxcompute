@@ -73,6 +73,7 @@ func newSQLTask(name, query string, config map[string]string) odpsTask {
 			"settings": `{"odps.sql.udf.strict.mode": "true"}`,
 		}
 	}
+	// maxcompute sql ends with ';', different from mysql/hive/...
 	return &odpsSQLTask{
 		Name:   name,
 		Query:  query,
