@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -21,6 +22,12 @@ var (
 )
 
 const currentProject = "curr_project"
+
+// http response error
+type responseError struct {
+	Code    string `json:"Code"`
+	Message string `json:"Message"`
+}
 
 type pair struct {
 	k string
@@ -139,16 +146,18 @@ func (cred *Config) resource(resource string, args ...pair) string {
 }
 
 func parseResponseBody(res *http.Response) ([]byte, error) {
-	if res == nil {
-		return nil, errors.New("nil response")
-	}
-	if res.StatusCode >= 400 {
-		return nil, fmt.Errorf("parseResponseBody error: %d", res.StatusCode)
-	}
-	if res.Body == nil {
+	if res == nil || res.Body == nil {
 		return nil, errNilBody
 	}
-
 	defer res.Body.Close()
-	return ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
+
+	if res.StatusCode >= 400 {
+		re := responseError{}
+		if err = json.Unmarshal(body, &re); err != nil {
+			return nil, fmt.Errorf("parseResponseBody error: %d", res.StatusCode)
+		}
+		return nil, fmt.Errorf("parseResponseBody error: %d, %s. %s", res.StatusCode, re.Code, re.Message)
+	}
+	return body, err
 }
