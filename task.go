@@ -2,7 +2,6 @@ package gomaxcompute
 
 import (
 	"encoding/xml"
-	"strings"
 
 	"github.com/twinj/uuid"
 )
@@ -74,7 +73,7 @@ func newSQLTask(name, query string, config map[string]string) odpsTask {
 			"settings": `{"odps.sql.udf.strict.mode": "true"}`,
 		}
 	}
-  
+
 	return &odpsSQLTask{
 		Name:   name,
 		Query:  query,
