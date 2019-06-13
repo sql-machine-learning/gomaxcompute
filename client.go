@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -22,17 +23,25 @@ var (
 
 const currentProject = "curr_project"
 
+// http response error
+type responseError struct {
+	Code    string `json:"Code"`
+	Message string `json:"Message"`
+}
+
 type pair struct {
 	k string
 	v string
 }
 
 // optional: Body, Header
-func (conn *odpsConn) request(method, resource string, body []byte, header ...pair) (res *http.Response, err error) {
+func (conn *odpsConn) request(method, resource string,
+	body []byte, header ...pair) (res *http.Response, err error) {
 	return conn.requestEndpoint(conn.Endpoint, method, resource, body, header...)
 }
 
-func (conn *odpsConn) requestEndpoint(endpoint, method, resource string, body []byte, header ...pair) (res *http.Response, err error) {
+func (conn *odpsConn) requestEndpoint(endpoint, method, resource string,
+	body []byte, header ...pair) (res *http.Response, err error) {
 	var req *http.Request
 	url := endpoint + resource
 	if body != nil {
@@ -138,17 +147,20 @@ func (cred *Config) resource(resource string, args ...pair) string {
 	return fmt.Sprintf("/projects/%s%s?%s", cred.Project, resource, ps.Encode())
 }
 
-func parseResponseBody(res *http.Response) ([]byte, error) {
-	if res == nil {
-		return nil, errors.New("nil response")
-	}
-	if res.StatusCode >= 400 {
-		return nil, fmt.Errorf("parseResponseBody error: %d", res.StatusCode)
-	}
-	if res.Body == nil {
+func parseResponseBody(rsp *http.Response) ([]byte, error) {
+	if rsp == nil || rsp.Body == nil {
 		return nil, errNilBody
 	}
+	defer rsp.Body.Close()
+	body, err := ioutil.ReadAll(rsp.Body)
 
-	defer res.Body.Close()
-	return ioutil.ReadAll(res.Body)
+	if rsp.StatusCode >= 400 {
+		re := responseError{}
+		if err = json.Unmarshal(body, &re); err != nil {
+			return nil, fmt.Errorf("response error: %d", rsp.StatusCode)
+		}
+		return nil, fmt.Errorf("response error: %d, %s. %s",
+			rsp.StatusCode, re.Code, re.Message)
+	}
+	return body, err
 }
