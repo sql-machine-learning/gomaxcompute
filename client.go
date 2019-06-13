@@ -35,11 +35,13 @@ type pair struct {
 }
 
 // optional: Body, Header
-func (conn *odpsConn) request(method, resource string, body []byte, header ...pair) (res *http.Response, err error) {
+func (conn *odpsConn) request(method, resource string,
+	body []byte, header ...pair) (res *http.Response, err error) {
 	return conn.requestEndpoint(conn.Endpoint, method, resource, body, header...)
 }
 
-func (conn *odpsConn) requestEndpoint(endpoint, method, resource string, body []byte, header ...pair) (res *http.Response, err error) {
+func (conn *odpsConn) requestEndpoint(endpoint, method, resource string,
+	body []byte, header ...pair) (res *http.Response, err error) {
 	var req *http.Request
 	url := endpoint + resource
 	if body != nil {
@@ -145,19 +147,20 @@ func (cred *Config) resource(resource string, args ...pair) string {
 	return fmt.Sprintf("/projects/%s%s?%s", cred.Project, resource, ps.Encode())
 }
 
-func parseResponseBody(res *http.Response) ([]byte, error) {
-	if res == nil || res.Body == nil {
+func parseResponseBody(rsp *http.Response) ([]byte, error) {
+	if rsp == nil || rsp.Body == nil {
 		return nil, errNilBody
 	}
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	defer rsp.Body.Close()
+	body, err := ioutil.ReadAll(rsp.Body)
 
-	if res.StatusCode >= 400 {
+	if rsp.StatusCode >= 400 {
 		re := responseError{}
 		if err = json.Unmarshal(body, &re); err != nil {
-			return nil, fmt.Errorf("parseResponseBody error: %d", res.StatusCode)
+			return nil, fmt.Errorf("response error: %d", rsp.StatusCode)
 		}
-		return nil, fmt.Errorf("parseResponseBody error: %d, %s. %s", res.StatusCode, re.Code, re.Message)
+		return nil, fmt.Errorf("response error: %d, %s. %s",
+			rsp.StatusCode, re.Code, re.Message)
 	}
 	return body, err
 }
