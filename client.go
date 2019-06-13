@@ -74,6 +74,9 @@ func (conn *odpsConn) requestEndpoint(endpoint, method, resource string,
 		req.URL.Query().Set(currentProject, conn.Project)
 	}
 	conn.sign(req)
+	log.Info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	log.Infof("request.header: %v", req.Header)
+	log.Info("--------------------------------------------------------------------------------")
 	return conn.Do(req)
 }
 
