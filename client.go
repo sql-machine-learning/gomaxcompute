@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -111,8 +112,17 @@ func (conn *odpsConn) sign(r *http.Request) {
 		canonicalResource.WriteString(r.URL.Path)
 	}
 	if urlParams := r.URL.Query(); len(urlParams) > 0 {
+		// query parameters need to be hashed in alphabet order
+		keys := make([]string, len(urlParams))
+		i := 0
+		for k := range urlParams {
+			keys[i] = k
+			i++
+		}
+		sort.Strings(keys)
+
 		first := true
-		for k, v := range urlParams {
+		for _, k := range keys {
 			if first {
 				canonicalResource.WriteByte('?')
 				first = false
@@ -120,6 +130,7 @@ func (conn *odpsConn) sign(r *http.Request) {
 				canonicalResource.WriteByte('&')
 			}
 			canonicalResource.WriteString(k)
+			v := urlParams[k]
 			if v != nil && len(v) > 0 && v[0] != "" {
 				canonicalResource.WriteByte('=')
 				canonicalResource.WriteString(v[0])
