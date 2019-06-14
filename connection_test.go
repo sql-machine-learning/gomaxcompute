@@ -1,3 +1,4 @@
+
 package gomaxcompute
 
 import (
@@ -12,6 +13,7 @@ func TestQuery(t *testing.T) {
 	db, err := sql.Open("maxcompute", cfg4test.FormatDSN())
 	a.NoError(err)
 
-	_, err = db.Query("SELECT * FROM iris_test LIMIT 1;")
+	const stmt = `SELECT * FROM gomaxcompute_test LIMIT 1;`
+	_, err = db.Query(stmt)
 	a.NoError(err)
 }
