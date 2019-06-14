@@ -72,9 +72,10 @@ func (conn *odpsConn) requestEndpoint(endpoint, method, resource string, body []
 		req.URL.Query().Set(currentProject, conn.Project)
 	}
 	conn.sign(req)
-	log.Info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-	log.Infof("request.header: %v", req.Header)
-	log.Info("--------------------------------------------------------------------------------")
+	log.Debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	log.Debugf("request.url: %v", req.URL.String())
+	log.Debugf("request.header: %v", req.Header)
+	log.Debug("--------------------------------------------------------------------------------")
 	return conn.Do(req)
 }
 
@@ -158,7 +159,7 @@ func parseResponseBody(rsp *http.Response) ([]byte, error) {
 	if rsp.StatusCode >= 400 {
 		re := responseError{}
 		if err = json.Unmarshal(body, &re); err != nil {
-			return nil, errors.WithStack(fmt.Errorf("response error: %d %v", rsp.StatusCode, err))
+			return nil, errors.WithStack(fmt.Errorf("response error: %d. json error: %v", rsp.StatusCode, err))
 		}
 		return nil, errors.WithStack(fmt.Errorf("response error: %d, %s. %s", rsp.StatusCode, re.Code, re.Message))
 	}
