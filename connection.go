@@ -3,8 +3,8 @@ package gomaxcompute
 import (
 	"database/sql/driver"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"net/http"
 	"net/url"
 	"strings"
@@ -99,8 +99,11 @@ func (conn *odpsConn) getResultMeta(instance, tunnelServer string) (*resultMeta,
 	}
 
 	meta := resultMeta{}
-	err = json.Unmarshal(body, &meta)
-	return &meta, err
+	if err := json.Unmarshal(body, &meta); err != nil {
+		return nil, errors.WithStack(fmt.Errorf("%v %s", err, string(body)))
+	}
+
+	return &meta, nil
 }
 
 func (conn *odpsConn) getTunnelServer() (string, error) {

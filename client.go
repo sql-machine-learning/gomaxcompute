@@ -6,11 +6,12 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -35,23 +36,21 @@ type pair struct {
 }
 
 // optional: Body, Header
-func (conn *odpsConn) request(method, resource string,
-	body []byte, header ...pair) (res *http.Response, err error) {
+func (conn *odpsConn) request(method, resource string, body []byte, header ...pair) (res *http.Response, err error) {
 	return conn.requestEndpoint(conn.Endpoint, method, resource, body, header...)
 }
 
-func (conn *odpsConn) requestEndpoint(endpoint, method, resource string,
-	body []byte, header ...pair) (res *http.Response, err error) {
+func (conn *odpsConn) requestEndpoint(endpoint, method, resource string, body []byte, header ...pair) (res *http.Response, err error) {
 	var req *http.Request
 	url := endpoint + resource
 	if body != nil {
 		if req, err = http.NewRequest(method, url, bytes.NewBuffer(body)); err != nil {
-			return
+			return nil, errors.WithStack(err)
 		}
 		req.Header.Set("Content-Length", strconv.Itoa(len(body)))
 	} else {
 		if req, err = http.NewRequest(method, url, nil); err != nil {
-			return
+			return nil, errors.WithStack(err)
 		}
 	}
 
@@ -109,8 +108,17 @@ func (conn *odpsConn) sign(r *http.Request) {
 		canonicalResource.WriteString(r.URL.Path)
 	}
 	if urlParams := r.URL.Query(); len(urlParams) > 0 {
+		// query parameters need to be hashed in alphabet order
+		keys := make([]string, len(urlParams))
+		i := 0
+		for k := range urlParams {
+			keys[i] = k
+			i++
+		}
+		sort.Strings(keys)
+
 		first := true
-		for k, v := range urlParams {
+		for _, k := range keys {
 			if first {
 				canonicalResource.WriteByte('?')
 				first = false
@@ -118,6 +126,7 @@ func (conn *odpsConn) sign(r *http.Request) {
 				canonicalResource.WriteByte('&')
 			}
 			canonicalResource.WriteString(k)
+			v := urlParams[k]
 			if v != nil && len(v) > 0 && v[0] != "" {
 				canonicalResource.WriteByte('=')
 				canonicalResource.WriteString(v[0])
@@ -157,10 +166,9 @@ func parseResponseBody(rsp *http.Response) ([]byte, error) {
 	if rsp.StatusCode >= 400 {
 		re := responseError{}
 		if err = json.Unmarshal(body, &re); err != nil {
-			return nil, fmt.Errorf("response error: %d", rsp.StatusCode)
+			return nil, errors.WithStack(fmt.Errorf("response error: %d. json error: %v", rsp.StatusCode, err))
 		}
-		return nil, fmt.Errorf("response error: %d, %s. %s",
-			rsp.StatusCode, re.Code, re.Message)
+		return nil, errors.WithStack(fmt.Errorf("response error: %d, %s. %s", rsp.StatusCode, re.Code, re.Message))
 	}
 	return body, err
 }
