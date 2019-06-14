@@ -67,8 +67,7 @@ func (conn *odpsConn) Query(query string, args []driver.Value) (driver.Rows, err
 	}
 	log.Infof("++Query:[%s] tunnel:[%s]", query, tunnelServer)
 	// get meta by tunnel
-	// TODO(tony): make retry time = 3 configurable
-	meta, err := conn.getResultMetaWithRetry(ins, tunnelServer, 3)
+	meta, err := conn.getResultMeta(ins, tunnelServer)
 	if err != nil {
 		log.Error("------------above error------------------")
 		return nil, err
@@ -82,25 +81,6 @@ func (conn *odpsConn) Query(query string, args []driver.Value) (driver.Rows, err
 		return nil, errors.New(res)
 	}
 	return newRows(meta, res)
-}
-
-func (conn *odpsConn) getResultMetaWithRetry(instance, tunnelServer string, retry int) (*resultMeta, error) {
-	var meta *resultMeta
-	var err error
-	for r := 0; r < retry; r++ {
-		meta, err = conn.getResultMeta(instance, tunnelServer)
-		if err != nil {
-			log.Errorf("retrying %d...", r)
-			time.Sleep(time.Second)
-			continue
-		}
-		break
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	return meta, nil
 }
 
 func (conn *odpsConn) getResultMeta(instance, tunnelServer string) (*resultMeta, error) {
