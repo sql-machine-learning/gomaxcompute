@@ -67,6 +67,7 @@ func (conn *odpsConn) Query(query string, args []driver.Value) (driver.Rows, err
 	}
 	log.Infof("++Query:[%s] tunnel:[%s]", query, tunnelServer)
 	// get meta by tunnel
+	// TODO(tony): make retry time = 3 configurable
 	meta, err := conn.getResultMetaWithRetry(ins, tunnelServer, 3)
 	if err != nil {
 		log.Error("------------above error------------------")
