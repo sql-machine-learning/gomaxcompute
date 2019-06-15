@@ -76,8 +76,7 @@ func newSQLTask(name, query string, config map[string]string) odpsTask {
 	}
 	// maxcompute sql ends with a ';'
 	query = strings.TrimSpace(query)
-	n := len(query)
-	if n > 0 && query[n-1] != ';' {
+	if n := len(query); n > 0 && query[n-1] != ';' {
 		query = query + ";"
 	}
 
