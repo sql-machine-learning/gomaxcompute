@@ -73,6 +73,10 @@ func (conn *odpsConn) requestEndpoint(endpoint, method, resource string, body []
 		req.URL.Query().Set(currentProject, conn.Project)
 	}
 	conn.sign(req)
+	log.Debug("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+	log.Debugf("request.url: %v", req.URL.String())
+	log.Debugf("request.header: %v", req.Header)
+	log.Debug("--------------------------------------------------------------------------------")
 	return conn.Do(req)
 }
 

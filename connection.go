@@ -65,6 +65,7 @@ func (conn *odpsConn) Query(query string, args []driver.Value) (driver.Rows, err
 	if err != nil {
 		return nil, err
 	}
+	log.Debugf("++Query:[%s] tunnel:[%s]", query, tunnelServer)
 	// get meta by tunnel
 	meta, err := conn.getResultMeta(ins, tunnelServer)
 	if err != nil {
