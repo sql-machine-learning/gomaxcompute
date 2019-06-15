@@ -20,7 +20,7 @@ func getEnv(key, fallback string) string {
 }
 
 func init() {
-	logDir := getEnv("GOMAXCOMPUTE_log_dir", "./logs")
+	logDir := getEnv("GOMAXCOMPUTE_log_dir", "")
 	logLevel := getEnv("GOMAXCOMPUTE_log_level", "info")
 
 	ll, e := logrus.ParseLevel(logLevel)
