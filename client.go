@@ -167,18 +167,17 @@ func parseResponseBody(rsp *http.Response) ([]byte, error) {
 	}
 	defer rsp.Body.Close()
 	body, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return nil, err
+	}
 
-	if err == nil {
-		err = maxcomputeResponseError(rsp.StatusCode, body)
+	if rsp.StatusCode >= 400 {
+		return nil, maxcomputeResponseError(rsp.StatusCode, body)
 	}
 	return body, err
 }
 
 func maxcomputeResponseError(statusCode int, body []byte) error {
-	if statusCode < 400 {
-		return nil
-	}
-
 	re := responseError{}
 	if err := json.Unmarshal(body, &re); err == nil {
 		return fmt.Errorf("response error: %d, %s. %s",
