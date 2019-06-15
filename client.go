@@ -181,8 +181,8 @@ func parseResponseBody(rsp *http.Response) ([]byte, error) {
 func parseResponseError(statusCode int, body []byte) error {
 	re := responseError{}
 	if err := json.Unmarshal(body, &re); err != nil {
-		return fmt.Errorf("response error: %d, %s", statusCode, string(body))
+		return errors.WithStack(fmt.Errorf("response error: %d, %s", statusCode, string(body)))
 	}
-	return fmt.Errorf("response error: %d, %s. %s",
-		statusCode, re.Code, re.Message)
+	return errors.WithStack(fmt.Errorf("response error: %d, %s. %s",
+		statusCode, re.Code, re.Message))
 }
