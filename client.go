@@ -164,8 +164,8 @@ func parseResponseBody(rsp *http.Response) ([]byte, error) {
 	if rsp == nil || rsp.Body == nil {
 		return nil, errNilBody
 	}
-  log.Debugf("response code: %v", rsp.StatusCode)
-  
+	log.Debugf("response code: %v", rsp.StatusCode)
+
 	defer rsp.Body.Close()
 	body, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
@@ -173,16 +173,16 @@ func parseResponseBody(rsp *http.Response) ([]byte, error) {
 	}
 
 	if rsp.StatusCode >= 400 {
-		return nil, maxcomputeResponseError(rsp.StatusCode, body)
+		return nil, parseResponseError(rsp.StatusCode, body)
 	}
 	return body, err
 }
 
-func maxcomputeResponseError(statusCode int, body []byte) error {
+func parseResponseError(statusCode int, body []byte) error {
 	re := responseError{}
-	if err := json.Unmarshal(body, &re); err == nil {
-		return fmt.Errorf("response error: %d, %s. %s",
-			statusCode, re.Code, re.Message)
+	if err := json.Unmarshal(body, &re); err != nil {
+		return fmt.Errorf("response error: %d, %s", statusCode, string(body))
 	}
-	return fmt.Errorf("response error: %d, %s", statusCode, string(body))
+	return fmt.Errorf("response error: %d, %s. %s",
+		statusCode, re.Code, re.Message)
 }
