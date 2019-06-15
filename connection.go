@@ -55,6 +55,9 @@ func (conn *odpsConn) Exec(query string, args []driver.Value) (driver.Result, er
 
 // Implements database/sql/driver.Queryer
 func (conn *odpsConn) Query(query string, args []driver.Value) (driver.Rows, error) {
+	log.Debug("--------------------------------------------------------------------------------")
+	log.Debugf("Query:[%s]", query)
+
 	ins, err := conn.wait(query, args)
 	if err != nil {
 		return nil, err
@@ -65,7 +68,6 @@ func (conn *odpsConn) Query(query string, args []driver.Value) (driver.Rows, err
 	if err != nil {
 		return nil, err
 	}
-	log.Debugf("++Query:[%s] tunnel:[%s]", query, tunnelServer)
 	// get meta by tunnel
 	meta, err := conn.getResultMeta(ins, tunnelServer)
 	if err != nil {
@@ -103,6 +105,7 @@ func (conn *odpsConn) getResultMeta(instance, tunnelServer string) (*resultMeta,
 	if err := json.Unmarshal(body, &meta); err != nil {
 		return nil, errors.WithStack(fmt.Errorf("%v %s", err, string(body)))
 	}
+	log.Debugf("meta: %+v", meta)
 
 	return &meta, nil
 }
