@@ -1,8 +1,10 @@
 package gomaxcompute
 
 import (
+	"encoding/base64"
 	"encoding/xml"
-	"errors"
+	"fmt"
+	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -11,9 +13,15 @@ type instanceStatus struct {
 	Status  string   `xml:"Status"`
 }
 
+type Result struct {
+	Content   string `xml:",cdata"`
+	Transform string `xml:"Transform,attr"`
+	Format    string `xml:"Format,attr"`
+}
+
 type instanceResult struct {
 	XMLName xml.Name `xml:"Instance"`
-	Result  string   `xml:"Tasks>Task>Result"`
+	Result  Result   `xml:"Tasks>Task>Result"`
 }
 
 // instance types：SQL
@@ -79,9 +87,28 @@ func (conn *odpsConn) getInstanceResult(instanceID string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	return decodeInstanceResult(body)
+}
+
+func decodeInstanceResult(result []byte) (string, error) {
 	var ir instanceResult
-	if err = xml.Unmarshal(body, &ir); err != nil {
+	if err := xml.Unmarshal(result, &ir); err != nil {
 		return "", err
 	}
-	return ir.Result, nil
+	if ir.Result.Format != "csv" {
+		return "", errors.WithStack(fmt.Errorf("unsupported format %v", ir.Result.Format))
+	}
+
+	switch ir.Result.Transform {
+	case "":
+		return ir.Result.Content, nil
+	case "Base64":
+		content, err := base64.StdEncoding.DecodeString(ir.Result.Content)
+		if err != nil {
+			return "", err
+		}
+		return string(content), err
+	default:
+		return "", errors.WithStack(fmt.Errorf("unsupported transform %v", ir.Result.Transform))
+	}
 }
