@@ -2,6 +2,7 @@ package gomaxcompute
 
 import (
 	"encoding/xml"
+	"strings"
 
 	"github.com/twinj/uuid"
 )
@@ -72,6 +73,11 @@ func newSQLTask(name, query string, config map[string]string) odpsTask {
 			"uuid":     uuid.NewV4().String(),
 			"settings": `{"odps.sql.udf.strict.mode": "true"}`,
 		}
+	}
+	// maxcompute sql ends with a ';'
+	query = strings.TrimSpace(query)
+	if n := len(query); n > 0 && query[n-1] != ';' {
+		query = query + ";"
 	}
 
 	return &odpsSQLTask{
