@@ -41,6 +41,8 @@ func (*odpsConn) Close() error {
 
 // Implements database/sql/driver.Execer. Notice result is nil
 func (conn *odpsConn) Exec(query string, args []driver.Value) (driver.Result, error) {
+	log.Debug("--------------------------------------------------------------------------------")
+	log.Debugf("Exec:[%s]", query)
 	ins, err := conn.wait(query, args)
 	if err != nil {
 		return nil, err

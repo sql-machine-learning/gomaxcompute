@@ -95,6 +95,14 @@ func decodeInstanceResult(result []byte) (string, error) {
 	if err := xml.Unmarshal(result, &ir); err != nil {
 		return "", err
 	}
+
+	if ir.Result.Format == "text" {
+		// FIXME(tony): the result non-query statement usually in text format.
+		// Go's database/sql API only supports lastId and affectedRows.
+		log.Debug(ir.Result.Content)
+		return "", nil
+	}
+
 	if ir.Result.Format != "csv" {
 		return "", errors.WithStack(fmt.Errorf("unsupported format %v", ir.Result.Format))
 	}

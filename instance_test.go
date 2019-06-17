@@ -37,7 +37,7 @@ func TestDecodeInstanceResult(t *testing.T) {
 
 	{
 		_, err := decodeInstanceResult([]byte(fmt.Sprintf(s, "", "Format=\"text\"", "1,2,3")))
-		a.Error(err) // unsupported format text
+		a.NoError(err)
 	}
 
 	{
