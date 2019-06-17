@@ -1,8 +1,9 @@
 package gomaxcompute
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConfig_ParseDSN(t *testing.T) {
@@ -32,15 +33,23 @@ func TestConfig_ParseDSN(t *testing.T) {
 		_, err = ParseDSN(dsn)
 		a.Error(err)
 	}
+
+	goodDSN := []string{
+		"64pxmm:oRdhg=@127.0.0.1:8002/api?curr_project=test_ci&scheme=http",
+	}
+	for _, dsn := range goodDSN {
+		_, err = ParseDSN(dsn)
+		a.NoError(err)
+	}
 }
 
 func TestConfig_FormatDSN(t *testing.T) {
 	a := assert.New(t)
 	config := Config{
-		AccessID: "access_id",
+		AccessID:  "access_id",
 		AccessKey: "access_key",
-		Project: "test_ci",
-		Endpoint: "http://service.com/api"}
+		Project:   "test_ci",
+		Endpoint:  "http://service.com/api"}
 	a.Equal("access_id:access_key@service.com/api?curr_project=test_ci&scheme=http", config.FormatDSN())
 }
 
