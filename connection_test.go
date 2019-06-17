@@ -68,6 +68,7 @@ func TestBadExec(t *testing.T) {
 	db, err := sql.Open("maxcompute", cfg4test.FormatDSN())
 	a.NoError(err)
 
+	// Table not found
 	tn := fmt.Sprintf("unitest%d", rand.Int())
 	_, err = db.Exec(fmt.Sprintf("DROP TABLE %s;", tn))
 	a.Error(err)
