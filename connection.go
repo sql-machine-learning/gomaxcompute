@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -65,6 +64,12 @@ func (conn *odpsConn) Query(query string, args []driver.Value) (driver.Rows, err
 		return nil, err
 	}
 
+	// check if instance success
+	res, err := conn.getInstanceResult(ins)
+	if err != nil {
+		return nil, err
+	}
+
 	// get tunnel server
 	tunnelServer, err := conn.getTunnelServer()
 	if err != nil {
@@ -76,13 +81,6 @@ func (conn *odpsConn) Query(query string, args []driver.Value) (driver.Rows, err
 		return nil, err
 	}
 
-	res, err := conn.getInstanceResult(ins)
-	if err != nil {
-		return nil, err
-	}
-	if strings.HasPrefix(res, "ODPS-") {
-		return nil, errors.New(res)
-	}
 	return newRows(meta, res)
 }
 

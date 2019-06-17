@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"math/rand"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -48,4 +49,27 @@ func TestQueryBase64(t *testing.T) {
 		row.Scan(&s)
 		a.Equal("\001", s)
 	}
+}
+
+func TestBadQuery(t *testing.T) {
+	a := assert.New(t)
+	db, err := sql.Open("maxcompute", cfg4test.FormatDSN())
+	a.NoError(err)
+
+	// Table not found
+	tn := fmt.Sprintf("unitest%d", rand.Int())
+	_, err = db.Query(fmt.Sprintf("SELECT * FROM %s;", tn))
+	a.Error(err)
+	a.True(strings.Contains(err.Error(), "Table not found"))
+}
+
+func TestBadExec(t *testing.T) {
+	a := assert.New(t)
+	db, err := sql.Open("maxcompute", cfg4test.FormatDSN())
+	a.NoError(err)
+
+	tn := fmt.Sprintf("unitest%d", rand.Int())
+	_, err = db.Exec(fmt.Sprintf("DROP TABLE %s;", tn))
+	a.Error(err)
+	a.True(strings.Contains(err.Error(), "Table not found"))
 }
