@@ -98,9 +98,13 @@ func decodeInstanceResult(result []byte) (string, error) {
 	}
 
 	if ir.Result.Format == "text" {
+		log.Debug(ir.Result.Content)
+		// ODPS errors are text begin with "ODPS-"
+		if strings.HasPrefix(ir.Result.Content, "ODPS-") {
+			return "", errors.WithStack(errors.New(ir.Result.Content))
+		}
 		// FIXME(tony): the result non-query statement usually in text format.
 		// Go's database/sql API only supports lastId and affectedRows.
-		log.Debug(ir.Result.Content)
 		return "", nil
 	}
 
