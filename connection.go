@@ -4,11 +4,12 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -98,7 +99,7 @@ func (conn *odpsConn) getResultMeta(instance, tunnelServer string) (*resultMeta,
 	if err != nil {
 		return nil, err
 	}
-	body, err := parseResponseBody(rsp)
+	body, err := parseResponse(rsp)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +119,7 @@ func (conn *odpsConn) getTunnelServer() (string, error) {
 		return "", err
 	}
 
-	url, err := parseResponseBody(rsp)
+	url, err := parseResponse(rsp)
 	if err != nil {
 		return "", err
 	}
