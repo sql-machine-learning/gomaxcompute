@@ -25,6 +25,18 @@ type instanceResult struct {
 	Result  Result   `xml:"Tasks>Task>Result"`
 }
 
+type instanceErrorMessage struct {
+	CDATA string `xml:",cdata"`
+}
+
+type instanceError struct {
+	XMLName   xml.Name             `xml:"Error"`
+	Code      string               `xml:"Code"`
+	Message   instanceErrorMessage `xml:"Message"`
+	RequestId string               `xml:"RequestId"`
+	HostId    string               `xml:"HostId"`
+}
+
 // instance types：SQL
 func (conn *odpsConn) createInstance(job *odpsJob) (string, error) {
 	if job == nil {

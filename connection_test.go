@@ -74,3 +74,17 @@ func TestBadExec(t *testing.T) {
 	a.Error(err)
 	a.True(strings.Contains(err.Error(), "Table not found"))
 }
+
+func TestInvalidSyntax(t *testing.T) {
+	a := assert.New(t)
+	db, err := sql.Open("maxcompute", cfg4test.FormatDSN())
+	a.NoError(err)
+
+	_, err = db.Query(`SLEECT CAST("\001" AS string) AS a;`)
+	a.Error(err)
+	a.Equal(`ParseError: {ODPS-0130161:[1,1] Parse exception - invalid token 'SLEECT'}`, err.Error())
+
+	_, err = db.Exec(`DROP ;`)
+	a.Error(err)
+	a.Equal(`ParseError: {ODPS-0130161:[1,6] Parse exception - invalid token ';'}`, err.Error())
+}
