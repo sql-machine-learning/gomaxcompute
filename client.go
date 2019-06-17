@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -15,6 +14,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -163,16 +164,25 @@ func parseResponseBody(rsp *http.Response) ([]byte, error) {
 	if rsp == nil || rsp.Body == nil {
 		return nil, errNilBody
 	}
-	defer rsp.Body.Close()
-	body, err := ioutil.ReadAll(rsp.Body)
 	log.Debugf("response code: %v", rsp.StatusCode)
 
+	defer rsp.Body.Close()
+	body, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	if rsp.StatusCode >= 400 {
-		re := responseError{}
-		if err = json.Unmarshal(body, &re); err != nil {
-			return nil, errors.WithStack(fmt.Errorf("response error: %d. json error: %v", rsp.StatusCode, err))
-		}
-		return nil, errors.WithStack(fmt.Errorf("response error: %d, %s. %s", rsp.StatusCode, re.Code, re.Message))
+		return nil, parseResponseError(rsp.StatusCode, body)
 	}
 	return body, err
+}
+
+func parseResponseError(statusCode int, body []byte) error {
+	re := responseError{}
+	if err := json.Unmarshal(body, &re); err != nil {
+		return errors.WithStack(fmt.Errorf("response error: %d, %s", statusCode, string(body)))
+	}
+	return errors.WithStack(fmt.Errorf("response error: %d, %s. %s",
+		statusCode, re.Code, re.Message))
 }
