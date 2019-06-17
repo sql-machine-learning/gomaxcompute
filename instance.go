@@ -4,8 +4,9 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
-	"github.com/pkg/errors"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 type instanceStatus struct {
@@ -35,7 +36,7 @@ func (conn *odpsConn) createInstance(job *odpsJob) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if _, err = parseResponseBody(res); err != nil && err != errNilBody {
+	if _, err = parseResponse(res); err != nil && err != errNilBody {
 		return "", err
 	}
 
@@ -62,7 +63,7 @@ func (conn *odpsConn) getInstanceStatus(instanceID string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	body, err := parseResponseBody(res)
+	body, err := parseResponse(res)
 	if err != nil {
 		return "", err
 	}
@@ -83,7 +84,7 @@ func (conn *odpsConn) getInstanceResult(instanceID string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	body, err := parseResponseBody(rsp)
+	body, err := parseResponse(rsp)
 	if err != nil {
 		return "", err
 	}

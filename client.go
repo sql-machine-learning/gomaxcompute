@@ -160,7 +160,7 @@ func (cred *Config) resource(resource string, args ...pair) string {
 	return fmt.Sprintf("/projects/%s%s?%s", cred.Project, resource, ps.Encode())
 }
 
-func parseResponseBody(rsp *http.Response) ([]byte, error) {
+func parseResponse(rsp *http.Response) ([]byte, error) {
 	if rsp == nil || rsp.Body == nil {
 		return nil, errNilBody
 	}
