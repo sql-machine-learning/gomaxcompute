@@ -81,10 +81,14 @@ func TestInvalidSyntax(t *testing.T) {
 	a.NoError(err)
 
 	_, err = db.Query(`SLEECT CAST("\001" AS string) AS a;`)
-	a.Error(err)
+	a.NotNil(err)
 	a.Equal(`ParseError: {ODPS-0130161:[1,1] Parse exception - invalid token 'SLEECT'}`, err.Error())
 
 	_, err = db.Exec(`DROP ;`)
-	a.Error(err)
+	a.NotNil(err)
 	a.Equal(`ParseError: {ODPS-0130161:[1,6] Parse exception - invalid token ';'}`, err.Error())
+
+	_, err = db.Query(`SELECT * FROM i_dont_exist;`)
+	a.NotNil(err)
+	a.Equal(`ODPS-0130131:[1,15] Table not found - table gomaxcompute_driver_w7u.i_dont_exist cannot be resolved`, err.Error())
 }
