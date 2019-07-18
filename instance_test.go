@@ -2,10 +2,30 @@ package gomaxcompute
 
 import (
 	"encoding/base64"
+	"encoding/xml"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func TestDecodeInstanceError(t *testing.T) {
+	a := assert.New(t)
+
+	s := `<?xml version="1.0" encoding="UTF-8"?>
+<Error>
+	<Code>ParseError</Code>
+	<Message><![CDATA[ODPS-0130161:[1,1] Parse exception - invalid token 'SLEECT']]></Message>
+	<RequestId>5583C0893F7EC2D353</RequestId>
+	<HostId>odps.aliyun.com</HostId>
+</Error>`
+
+	var ie instanceError
+	a.NoError(xml.Unmarshal([]byte(s), &ie))
+	a.Equal(`ParseError`, ie.Code)
+	a.Equal(`ODPS-0130161:[1,1] Parse exception - invalid token 'SLEECT'`, ie.Message.CDATA)
+	a.Equal(`5583C0893F7EC2D353`, ie.RequestId)
+	a.Equal(`odps.aliyun.com`, ie.HostId)
+}
 
 func TestDecodeInstanceResult(t *testing.T) {
 	a := assert.New(t)

@@ -6,6 +6,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -181,8 +182,16 @@ func parseResponse(rsp *http.Response) ([]byte, error) {
 func parseResponseError(statusCode int, body []byte) error {
 	re := responseError{}
 	if err := json.Unmarshal(body, &re); err != nil {
-		return errors.WithStack(fmt.Errorf("response error: %d, %s", statusCode, string(body)))
+		ie := instanceError{}
+		if err := xml.Unmarshal([]byte(body), &ie); err != nil {
+			return errors.WithStack(fmt.Errorf("response error %d: %s", statusCode, string(body)))
+		}
+
+		code, err := parseErrorCode(ie.Message.CDATA)
+		if err != nil {
+			return errors.WithStack(fmt.Errorf("response error %d: %s", statusCode, string(body)))
+		}
+		return &MaxcomputeError{code, ie.Message.CDATA}
 	}
-	return errors.WithStack(fmt.Errorf("response error: %d, %s. %s",
-		statusCode, re.Code, re.Message))
+	return errors.WithStack(fmt.Errorf("response error %d: %s. %s", statusCode, re.Code, re.Message))
 }
