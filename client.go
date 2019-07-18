@@ -184,10 +184,14 @@ func parseResponseError(statusCode int, body []byte) error {
 	if err := json.Unmarshal(body, &re); err != nil {
 		ie := instanceError{}
 		if err := xml.Unmarshal([]byte(body), &ie); err != nil {
-			return errors.WithStack(fmt.Errorf("response error: %d, %s", statusCode, string(body)))
+			return errors.WithStack(fmt.Errorf("response error %d: %s", statusCode, string(body)))
 		}
-		return errors.WithStack(fmt.Errorf("%s: %s", ie.Code, ie.Message))
+
+		code, err := parseErrorCode(ie.Message.CDATA)
+		if err != nil {
+			return errors.WithStack(fmt.Errorf("response error %d: %s", statusCode, string(body)))
+		}
+		return &MaxcomputeError{code, ie.Message.CDATA}
 	}
-	return errors.WithStack(fmt.Errorf("response error: %d, %s. %s",
-		statusCode, re.Code, re.Message))
+	return errors.WithStack(fmt.Errorf("response error %d: %s. %s", statusCode, re.Code, re.Message))
 }

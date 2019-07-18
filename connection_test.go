@@ -77,18 +77,33 @@ func TestBadExec(t *testing.T) {
 
 func TestInvalidSyntax(t *testing.T) {
 	a := assert.New(t)
-	db, err := sql.Open("maxcompute", cfg4test.FormatDSN())
-	a.NoError(err)
+	db, e := sql.Open("maxcompute", cfg4test.FormatDSN())
+	a.NoError(e)
 
-	_, err = db.Query(`SLEECT CAST("\001" AS string) AS a;`)
-	a.NotNil(err)
-	a.Equal(`ParseError: {ODPS-0130161:[1,1] Parse exception - invalid token 'SLEECT'}`, err.Error())
+	{
+		_, err := db.Query(`SLEECT CAST("\001" AS string) AS a;`)
+		a.NotNil(err)
+		me, ok := err.(*MaxcomputeError)
+		a.True(ok)
+		a.Equal(`0130161`, me.Code)
+		a.Equal(`ODPS-0130161:[1,1] Parse exception - invalid token 'SLEECT'`, me.Error())
+	}
 
-	_, err = db.Exec(`DROP ;`)
-	a.NotNil(err)
-	a.Equal(`ParseError: {ODPS-0130161:[1,6] Parse exception - invalid token ';'}`, err.Error())
+	{
+		_, err := db.Exec(`DROP ;`)
+		a.NotNil(err)
+		me, ok := err.(*MaxcomputeError)
+		a.True(ok)
+		a.Equal(`0130161`, me.Code)
+		a.Equal(`ODPS-0130161:[1,6] Parse exception - invalid token ';'`, me.Error())
+	}
 
-	_, err = db.Query(`SELECT * FROM i_dont_exist;`)
-	a.NotNil(err)
-	a.Equal(`ODPS-0130131:[1,15] Table not found - table gomaxcompute_driver_w7u.i_dont_exist cannot be resolved`, err.Error())
+	{
+		_, err := db.Query(`SELECT * FROM i_dont_exist;`)
+		a.NotNil(err)
+		me, ok := err.(*MaxcomputeError)
+		a.True(ok)
+		a.Equal(`0130131`, me.Code)
+		a.Equal(`ODPS-0130131:[1,15] Table not found - table gomaxcompute_driver_w7u.i_dont_exist cannot be resolved`, me.Error())
+	}
 }
