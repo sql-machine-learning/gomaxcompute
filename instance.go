@@ -25,6 +25,18 @@ type instanceResult struct {
 	Result  Result   `xml:"Tasks>Task>Result"`
 }
 
+type instanceErrorMessage struct {
+	CDATA string `xml:",cdata"`
+}
+
+type instanceError struct {
+	XMLName   xml.Name             `xml:"Error"`
+	Code      string               `xml:"Code"`
+	Message   instanceErrorMessage `xml:"Message"`
+	RequestId string               `xml:"RequestId"`
+	HostId    string               `xml:"HostId"`
+}
+
 // instance types：SQL
 func (conn *odpsConn) createInstance(job *odpsJob) (string, error) {
 	if job == nil {
@@ -101,7 +113,11 @@ func decodeInstanceResult(result []byte) (string, error) {
 		log.Debug(ir.Result.Content)
 		// ODPS errors are text begin with "ODPS-"
 		if strings.HasPrefix(ir.Result.Content, "ODPS-") {
-			return "", errors.WithStack(errors.New(ir.Result.Content))
+			code, err := parseErrorCode(ir.Result.Content)
+			if err != nil {
+				return "", errors.WithStack(errors.New(ir.Result.Content))
+			}
+			return "", &MaxcomputeError{code, ir.Result.Content}
 		}
 		// FIXME(tony): the result non-query statement usually in text format.
 		// Go's database/sql API only supports lastId and affectedRows.
