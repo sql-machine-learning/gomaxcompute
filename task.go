@@ -71,7 +71,12 @@ func newSQLTask(name, query string, config map[string]string) odpsTask {
 	if config == nil {
 		config = map[string]string{
 			"uuid":     uuid.NewV4().String(),
-			"settings": `{"odps.sql.udf.strict.mode": "true"}`,
+			"settings": `{"odps.sql.submit.mode": "script"}`,
+			//"settings": `{"odps.sql.udf.strict.mode": "true"}`,
+		}
+	} else {
+		if _, ok := config["uuid"]; !ok {
+			config["uuid"] = uuid.NewV4().String()
 		}
 	}
 	// maxcompute sql ends with a ';'

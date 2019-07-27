@@ -22,6 +22,7 @@ const (
 type odpsConn struct {
 	*http.Client
 	*Config
+	hints map[string]string
 }
 
 // ODPS does not support transaction
@@ -129,7 +130,7 @@ func (conn *odpsConn) wait(query string, args []driver.Value) (string, error) {
 		query = fmt.Sprintf(query, args)
 	}
 
-	ins, err := conn.createInstance(newSQLJob(query))
+	ins, err := conn.createInstance(newSQLJob(query, conn.hints))
 	if err != nil {
 		return "", err
 	}
