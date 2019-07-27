@@ -8,15 +8,15 @@ import (
 
 // register driver
 func init() {
-	sql.Register("maxcompute", &ODPSDriver{})
+	sql.Register("maxcompute", &MaxcomputeDriver{})
 }
 
-// ODPSDriver impls database/sql/driver.Driver
-type ODPSDriver struct {
+// MaxcomputeDriver impls database/sql/driver.Driver
+type MaxcomputeDriver struct {
 	conn odpsConn
 }
 
-func (o ODPSDriver) Open(dsn string) (driver.Conn, error) {
+func (o MaxcomputeDriver) Open(dsn string) (driver.Conn, error) {
 	cfg, err := ParseDSN(dsn)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (o ODPSDriver) Open(dsn string) (driver.Conn, error) {
 
 // SetQuerySettings sets the global query settings.
 // TODO(Yancey1989): add the one-off query settings interface.
-func (o ODPSDriver) SetQuerySettings(hints map[string]string) error {
+func (o MaxcomputeDriver) SetQuerySettings(hints map[string]string) error {
 	o.conn.hints = hints
 	return nil
 }
