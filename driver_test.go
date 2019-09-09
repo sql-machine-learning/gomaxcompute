@@ -13,7 +13,7 @@ var cfg4test = &Config{
 	AccessKey:  os.Getenv("ODPS_ACCESS_KEY"),
 	Project:    os.Getenv("ODPS_PROJECT"),
 	Endpoint:   os.Getenv("ODPS_ENDPOINT"),
-	QueryHints: map[string]string{"hints_odps.sql.mapper.split_size": "16"},
+	QueryHints: map[string]string{"odps.sql.mapper.split_size": "16"},
 }
 
 func TestSQLOpen(t *testing.T) {

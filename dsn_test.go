@@ -53,7 +53,7 @@ func TestConfig_FormatDSN(t *testing.T) {
 		Endpoint:   "http://service.com/api",
 		QueryHints: map[string]string{"odps.sql.mapper.split_size": "16"}}
 	a.Equal("access_id:access_key@service.com/api?curr_project="+
-		"test_ci&scheme=http&hints_odps.sql.mapper.split_size=16", config.FormatDSN())
+		"test_ci&scheme=http&hint_odps.sql.mapper.split_size=16", config.FormatDSN())
 }
 
 func TestConfig_ParseAndFormatRoundTrip(t *testing.T) {
