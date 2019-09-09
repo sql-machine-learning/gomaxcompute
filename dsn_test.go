@@ -9,7 +9,7 @@ import (
 func TestConfig_ParseDSN(t *testing.T) {
 	a := assert.New(t)
 
-	correct := "access_id:access_key@service.com/api?curr_project=test_ci&scheme=http&hints_odps.sql.mapper.split_size=16"
+	correct := "access_id:access_key@service.com/api?curr_project=test_ci&scheme=http&hint_odps.sql.mapper.split_size=16"
 	config, err := ParseDSN(correct)
 	a.NoError(err)
 	a.Equal("access_id", config.AccessID)

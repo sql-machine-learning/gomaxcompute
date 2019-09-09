@@ -48,7 +48,7 @@ func ParseDSN(dsn string) (*Config, error) {
 	for k, v := range querys {
 		// The query args such as hints_odps.sql.mapper.split_size=16
 		// would be converted to the maxcompute query hints: {"odps.sql.mapper.split_size": "16"}
-		if strings.HasPrefix(k, "hints_") {
+		if strings.HasPrefix(k, "hint_") {
 			queryHints[k[6:]] = v[0]
 		}
 	}
@@ -77,7 +77,7 @@ func (cfg *Config) FormatDSN() string {
 		cfg.AccessID, cfg.AccessKey, endpointURL, cfg.Project, scheme)
 	if len(cfg.QueryHints) != 0 {
 		for k, v := range cfg.QueryHints {
-			dsnFormt = fmt.Sprintf("%s&hints_%s=%v", dsnFormt, k, v)
+			dsnFormt = fmt.Sprintf("%s&hint_%s=%v", dsnFormt, k, v)
 		}
 	}
 	return dsnFormt
