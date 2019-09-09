@@ -13,6 +13,8 @@ var (
 	reQuery = regexp.MustCompile(`^([a-zA-Z0-9_-]+)=([a-zA-Z0-9_-]*)$`)
 )
 
+const HINT_PREFIX = "hint_"
+
 type Config struct {
 	AccessID   string
 	AccessKey  string
@@ -49,7 +51,7 @@ func ParseDSN(dsn string) (*Config, error) {
 		// The query args such as hints_odps.sql.mapper.split_size=16
 		// would be converted to the maxcompute query hints: {"odps.sql.mapper.split_size": "16"}
 		if strings.HasPrefix(k, "hint_") {
-			queryHints[k[6:]] = v[0]
+			queryHints[k[5:]] = v[0]
 		}
 	}
 
