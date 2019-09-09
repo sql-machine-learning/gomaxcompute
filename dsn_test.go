@@ -9,13 +9,14 @@ import (
 func TestConfig_ParseDSN(t *testing.T) {
 	a := assert.New(t)
 
-	correct := "access_id:access_key@service.com/api?curr_project=test_ci&scheme=http"
+	correct := "access_id:access_key@service.com/api?curr_project=test_ci&scheme=http&hints_odps.sql.mapper.split_size=16"
 	config, err := ParseDSN(correct)
 	a.NoError(err)
 	a.Equal("access_id", config.AccessID)
 	a.Equal("access_key", config.AccessKey)
 	a.Equal("test_ci", config.Project)
 	a.Equal("http://service.com/api", config.Endpoint)
+	a.Equal("16", config.QueryHints["odps.sql.mapper.split_size"])
 
 	badDSN := []string{
 		"", // empty
@@ -46,11 +47,13 @@ func TestConfig_ParseDSN(t *testing.T) {
 func TestConfig_FormatDSN(t *testing.T) {
 	a := assert.New(t)
 	config := Config{
-		AccessID:  "access_id",
-		AccessKey: "access_key",
-		Project:   "test_ci",
-		Endpoint:  "http://service.com/api"}
-	a.Equal("access_id:access_key@service.com/api?curr_project=test_ci&scheme=http", config.FormatDSN())
+		AccessID:   "access_id",
+		AccessKey:  "access_key",
+		Project:    "test_ci",
+		Endpoint:   "http://service.com/api",
+		QueryHints: map[string]string{"odps.sql.mapper.split_size": "16"}}
+	a.Equal("access_id:access_key@service.com/api?curr_project="+
+		"test_ci&scheme=http&hints_odps.sql.mapper.split_size=16", config.FormatDSN())
 }
 
 func TestConfig_ParseAndFormatRoundTrip(t *testing.T) {

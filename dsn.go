@@ -2,6 +2,7 @@ package gomaxcompute
 
 import (
 	"fmt"
+	"net/url"
 	"regexp"
 	"strings"
 )
@@ -13,10 +14,11 @@ var (
 )
 
 type Config struct {
-	AccessID  string
-	AccessKey string
-	Project   string
-	Endpoint  string
+	AccessID   string
+	AccessKey  string
+	Project    string
+	Endpoint   string
+	QueryHints map[string]string
 }
 
 func ParseDSN(dsn string) (*Config, error) {
@@ -26,32 +28,41 @@ func ParseDSN(dsn string) (*Config, error) {
 	}
 	id, key, endpointURL := sub[1], sub[2], sub[3]
 
-	query := make(map[string]string)
-	for _, s := range strings.Split(sub[4], "&") {
-		pair := reQuery.FindStringSubmatch(s)
-		if len(pair) != 3 {
-			return nil, fmt.Errorf("dsn %s doesn't match access_id:access_key@url?curr_project=project&scheme=http|https", dsn)
+	var schemeArgs []string
+	var currProjArgs []string
+	var ok bool
+	queryHints := make(map[string]string)
+
+	querys, err := url.ParseQuery(sub[4])
+	if err != nil {
+		return nil, err
+	}
+
+	if schemeArgs, ok = querys["scheme"]; !ok || len(schemeArgs) != 1 {
+		return nil, fmt.Errorf("dsn %s should have one scheme argument", dsn)
+	}
+	if currProjArgs, ok = querys[currentProject]; !ok || len(currProjArgs) != 1 {
+		return nil, fmt.Errorf("dsn %s should have one current_project argument", dsn)
+	}
+
+	for k, v := range querys {
+		// The query args such as hints_odps.sql.mapper.split_size=16
+		// would be converted to the maxcompute query hints: {"odps.sql.mapper.split_size": "16"}
+		if strings.HasPrefix(k, "hints_") {
+			queryHints[k[6:]] = v[0]
 		}
-		if pair[1] != "scheme" && pair[1] != currentProject {
-			return nil, fmt.Errorf("dsn %s 's query is neither scheme or %s", dsn, currentProject)
-		}
-		query[pair[1]] = pair[2]
 	}
-	if _, ok := query[currentProject]; !ok {
-		return nil, fmt.Errorf("dsn %s doesn't have curr_project", dsn)
-	}
-	if _, ok := query["scheme"]; !ok {
-		return nil, fmt.Errorf("dsn %s doesn't have scheme", dsn)
-	}
-	if query["scheme"] != "http" && query["scheme"] != "https" {
+
+	if schemeArgs[0] != "http" && schemeArgs[0] != "https" {
 		return nil, fmt.Errorf("dsn %s 's scheme is neither http nor https", dsn)
 	}
 
 	config := &Config{
-		AccessID:  id,
-		AccessKey: key,
-		Project:   query[currentProject],
-		Endpoint:  query["scheme"] + "://" + endpointURL}
+		AccessID:   id,
+		AccessKey:  key,
+		Project:    currProjArgs[0],
+		Endpoint:   schemeArgs[0] + "://" + endpointURL,
+		QueryHints: queryHints}
 
 	return config, nil
 }
@@ -62,6 +73,12 @@ func (cfg *Config) FormatDSN() string {
 		return ""
 	}
 	scheme, endpointURL := pair[0], pair[1]
-	return fmt.Sprintf("%s:%s@%s?curr_project=%s&scheme=%s",
+	dsnFormt := fmt.Sprintf("%s:%s@%s?curr_project=%s&scheme=%s",
 		cfg.AccessID, cfg.AccessKey, endpointURL, cfg.Project, scheme)
+	if len(cfg.QueryHints) != 0 {
+		for k, v := range cfg.QueryHints {
+			dsnFormt = fmt.Sprintf("%s&hints_%s=%v", dsnFormt, k, v)
+		}
+	}
+	return dsnFormt
 }
