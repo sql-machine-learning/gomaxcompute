@@ -129,7 +129,7 @@ func (conn *odpsConn) wait(query string, args []driver.Value) (string, error) {
 		query = fmt.Sprintf(query, args)
 	}
 
-	ins, err := conn.createInstance(newSQLJob(query))
+	ins, err := conn.createInstance(newSQLJob(query, conn.QueryHints))
 	if err != nil {
 		return "", err
 	}

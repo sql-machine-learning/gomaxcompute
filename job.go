@@ -25,8 +25,8 @@ func newJob(tasks ...odpsTask) *odpsJob {
 	}
 }
 
-func newSQLJob(sql string) *odpsJob {
-	return newJob(newAnonymousSQLTask(sql, nil))
+func newSQLJob(sql string, hints map[string]string) *odpsJob {
+	return newJob(newAnonymousSQLTask(sql, hints))
 }
 
 func (j *odpsJob) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
