@@ -50,7 +50,7 @@ func ParseDSN(dsn string) (*Config, error) {
 	for k, v := range querys {
 		// The query args such as hints_odps.sql.mapper.split_size=16
 		// would be converted to the maxcompute query hints: {"odps.sql.mapper.split_size": "16"}
-		if strings.HasPrefix(k, "hint_") {
+		if strings.HasPrefix(k, HINT_PREFIX) {
 			queryHints[k[5:]] = v[0]
 		}
 	}
