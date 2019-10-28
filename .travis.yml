@@ -1,1 +1,2 @@
 language: go
+go_import_path: sqlflow.org/gomaxcompute
