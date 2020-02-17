@@ -9,8 +9,8 @@ import (
 
 var (
 	// Regexp syntax: https://github.com/google/re2/wiki/Syntax
-	reDSN   = regexp.MustCompile(`^([a-zA-Z0-9_-]+):([=a-zA-Z0-9_-]+)@([:a-zA-Z0-9/_.-]+)\?([^/]+)$`)
-	reQuery = regexp.MustCompile(`^([a-zA-Z0-9_-]+)=([a-zA-Z0-9_-]*)$`)
+	// reQuery = regexp.MustCompile(`^([a-zA-Z0-9_-]+)=([a-zA-Z0-9_-]*)$`)
+	reDSN = regexp.MustCompile(`^([a-zA-Z0-9_-]+):([=a-zA-Z0-9_-]+)@([:a-zA-Z0-9/_.-]+)\?([^/]+)$`)
 )
 
 const HINT_PREFIX = "hint_"

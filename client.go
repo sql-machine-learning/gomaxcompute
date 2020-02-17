@@ -50,10 +50,8 @@ func (conn *odpsConn) requestEndpoint(endpoint, method, resource string, body []
 			return nil, errors.WithStack(err)
 		}
 		req.Header.Set("Content-Length", strconv.Itoa(len(body)))
-	} else {
-		if req, err = http.NewRequest(method, url, nil); err != nil {
-			return nil, errors.WithStack(err)
-		}
+	} else if req, err = http.NewRequest(method, url, nil); err != nil {
+		return nil, errors.WithStack(err)
 	}
 
 	req.Header.Set("x-odps-user-agent", "gomaxcompute/0.0.1")
@@ -132,7 +130,7 @@ func (conn *odpsConn) sign(r *http.Request) {
 			}
 			canonicalResource.WriteString(k)
 			v := urlParams[k]
-			if v != nil && len(v) > 0 && v[0] != "" {
+			if len(v) > 0 && v[0] != "" {
 				canonicalResource.WriteByte('=')
 				canonicalResource.WriteString(v[0])
 			}
@@ -150,7 +148,7 @@ func (conn *odpsConn) sign(r *http.Request) {
 }
 
 func (cred *Config) resource(resource string, args ...pair) string {
-	if args == nil || len(args) == 0 {
+	if len(args) == 0 {
 		return fmt.Sprintf("/projects/%s%s", cred.Project, resource)
 	}
 
@@ -183,7 +181,7 @@ func parseResponseError(statusCode int, body []byte) error {
 	re := responseError{}
 	if err := json.Unmarshal(body, &re); err != nil {
 		ie := instanceError{}
-		if err := xml.Unmarshal([]byte(body), &ie); err != nil {
+		if err := xml.Unmarshal(body, &ie); err != nil {
 			return errors.WithStack(fmt.Errorf("response error %d: %s", statusCode, string(body)))
 		}
 
