@@ -1,0 +1,8 @@
+- repo: git://github.com/dnephin/pre-commit-golang
+  rev: master
+  hooks:
+    - id: go-fmt
+    - id: golangci-lint
+      args:
+       - --fix
+       - --color=always

@@ -27,5 +27,5 @@ type MaxcomputeError struct {
 }
 
 func (e *MaxcomputeError) Error() string {
-	return fmt.Sprintf("%s", e.Message)
+	return e.Message
 }
