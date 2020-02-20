@@ -20,7 +20,7 @@ func parseErrorCode(message string) (string, error) {
 
 // MaxcomputeError is an error type which represents a single Maxcompute error
 // Please refer to https://www.alibabacloud.com/help/doc-detail/64654.htm
-// for the list of SQL common error code
+// for the list of SQL common error code.
 type MaxcomputeError struct {
 	Code    string
 	Message string
