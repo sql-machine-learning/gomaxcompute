@@ -1,4 +1,4 @@
-module gitlab.mypaas.com.cn/dmp/gomaxcompute
+module sqlflow.org/gomaxcompute
 
 go 1.13
 
