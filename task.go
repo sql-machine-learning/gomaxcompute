@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"strings"
 
-	"github.com/twinj/uuid"
+	"github.com/google/uuid"
 )
 
 const anonymousSQLTask = "AnonymousSQLTask"
@@ -70,11 +70,11 @@ func newAnonymousSQLTask(query string, config map[string]string) odpsTask {
 func newSQLTask(name, query string, config map[string]string) odpsTask {
 	if config == nil {
 		config = map[string]string{
-			"uuid":     uuid.NewV4().String(),
+			"uuid":     uuid.NewString(),
 			"settings": `{"odps.sql.udf.strict.mode": "true"}`,
 		}
 	} else if _, ok := config["uuid"]; !ok {
-		config["uuid"] = uuid.NewV4().String()
+		config["uuid"] = uuid.NewString()
 	}
 	// maxcompute sql ends with a ';'
 	query = strings.TrimSpace(query)

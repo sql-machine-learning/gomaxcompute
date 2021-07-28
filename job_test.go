@@ -4,14 +4,14 @@ import (
 	"encoding/xml"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/twinj/uuid"
 )
 
 func TestJob_GenCreateInstanceXml(t *testing.T) {
 	a := assert.New(t)
 	task := newAnonymousSQLTask("SELECT 1;", map[string]string{
-		"uuid":     uuid.NewV4().String(),
+		"uuid":     uuid.NewString(),
 		"settings": `{"odps.sql.udf.strict.mode": "true"}`,
 	})
 	job := newJob(task)
